@@ -1,4 +1,5 @@
 .DS_Store
+_deploy.sh
 static.go
 pm_search
 assets/*
