@@ -1,0 +1,210 @@
+
+{{define "head_includes"}}
+  <link rel="stylesheet" type="text/css" href="/static/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+  <script type="text/javascript" src="/static/js/jquery-1.11.3.min.js"></script>
+  <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+{{end}}
+
+
+{{define "index"}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{{.Title}} - swillkb</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    {{template "head_includes" .}}
+    <script type="text/javascript">
+      $(function() {
+        $.ajax({
+          url: '/crawl_pms',
+          beforeSend: function(jqXHR, settings) {
+            $('#status-wrapper').html('<div class="progress progress-striped active"><div class="progress-bar" style="width: 100%;">Getting PMs...  It takes a few minutes...</div></div>');
+          },
+          success: function(data, status, jqXHR) {
+            $('#status-wrapper').html('<div class="status-success">Database Up-To-Date</div>');
+          },
+          error: function(jqXHR, status, err) {
+            $('#status-wrapper').html('<div class="fail-success">Error Updating DB: '+err+'</div>');
+          }
+        });
+
+        $('#search-btn').on('click', function(e) {
+          search(0);
+        });
+
+        $('#search-input').keypress(function (e) {
+          var key = e.which;
+          if(key == 13) { // the enter key code
+            $('#search-btn').click();
+            return false;  
+          }
+        });
+
+        $('#search-input').focus();
+
+      });
+
+      function search(from) {
+        search_text = $('#search-input').val();
+        if (search_text.trim() == "") {
+          return
+        }
+        $.ajax({
+          url: '/search',
+          contentType: 'application/json; charset=utf-8',
+          data: JSON.stringify({'search':search_text, 'from':from}),
+          type: 'post',
+          beforeSend: function(jqXHR, settings) {
+            $('#results').html('<div class="progress progress-striped active"><div class="progress-bar" style="width: 100%;">Searching PMs...</div></div>');
+          },
+          success: function(data, status, jqXHR) {
+            $('#results').html(data);
+          },
+          error: function(jqXHR, status, err) {
+            $('#results').html(err);
+          }
+        });
+      }
+    </script>
+  </head>
+  <body>
+    {{template "navbar" .}}
+
+    <div class="container">
+      
+      <div class="row pad-top">
+        <div class="col-lg-10 center-block">
+          <form>
+            <div class="form-group">
+              <div class="input-group search-wrapper">
+                <span class="input-group-addon"><a href="#" data-keyboard="true" data-toggle="modal" data-target="#help-modal"><span class="glyphicon glyphicon-question-sign"></span></a></span>
+                <input id="search-input" type="text" class="form-control" placeholder="enter your query...">
+                <span class="input-group-btn">
+                  <button id="search-btn" class="btn btn-primary" type="button">Search</button>
+                </span>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="modal fade" id="help-modal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove-sign"></span></button>
+              <h4 class="modal-title">Search Options</h4>
+            </div>
+            <div class="modal-body">
+              <div class="well">
+                The search functionality has been optimized for complex filtering to help reduce the result set and make the search result very specific to your query.  This may not be intuitive initially, but once you get the hang of it you will love it...
+              </div>
+              <p>
+                <b>Cheat Sheet</b><br/>
+                Nothing is case sensitive other than the <b>Field</b> labels (<code>To</code>, <code>From</code>, <code>Date</code>, <code>Title</code>, <code>Msg</code>), which are case sensitive.<br />
+                <ul>
+                  <li><b>Terms</b> (eg: <code>gh60</code>) without any additional markup are treated as 'result SHOULD include', but it is not strict.</li>
+                  <li><b>Phrases</b> (eg: <code>"gh60 case"</code>) are quoted and are treated as 'result SHOULD include' the phrase, but it is not strict.</li>
+                  <li><b>Fields</b> (eg: <code>From:swill</code>) use a colon to separate a field label and a term or phrase and are treated as 'result SHOULD include', but it is not strict. <b>Available Fields:</b> <code>To</code>, <code>From</code>, <code>Date</code>, <code>Title</code>, <code>Msg</code> (case sensitive)</li>
+                  <li><b>Inclusion and Exclusion</b> (eg: <code>+From:swill -Msg:stump "bro caps"</code>) is done using <code>+</code> and <code>-</code>.  <code>+</code> is treated as 'result MUST include' and <code>-</code> is treated as 'result MUST exclude'.</li>
+                  <li><b>Boosting</b> (eg: <code>Title:jtk^5 Msg:jtk</code>) allows you to priortize a specific term or phrase to increase its relative importance.</li>
+                  <li>All of these pieces can be combined to create very targeted searches. Eg: <code>From:swill -penumbra +bro stump^5</code></li>
+                  <li>More complete documentation can be <a href="http://www.blevesearch.com/docs/Query-String-Query/" target="_blank">found here</a>.</li>
+                </ul>
+              </p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ... add page content ... -->
+      <div class="row">
+        <div class="col-lg-12">
+          <div id="results"></div>
+        </div>
+      </div>
+    </div>
+</body>
+</html>
+{{end}}
+
+
+{{define "results"}}
+  <ul class="pager">
+    {{.Prev}}
+    {{.Curr}}
+    {{.Next}}
+  </ul>
+  {{range .Hits}}
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">{{.Title}}</h3>
+        <div class="panel-subtitle">from <b>{{.From}}</b> to <b>{{.To}}</b> on <b>{{.Date}}</b></div>
+      </div>
+      <div class="panel-body">
+        {{.Msg}}
+      </div>
+    </div>
+  {{end}}
+  <ul class="pager">
+    {{.Prev}}
+    {{.Curr}}
+    {{.Next}}
+  </ul>
+{{end}}
+
+
+{{define "error"}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{{.Title}} - swillkb</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    {{template "head_includes" .}}
+  </head>
+  <body>
+    {{template "navbar" .}}
+
+    <div class="container">
+      <div class="alert alert-danger">
+        <b>{{.Title}} ({{.ErrorCode}}) :</b> {{.ErrorDesc}}
+      </div>
+    </div>
+</body>
+</html>
+{{end}}
+
+
+{{define "navbar"}}
+    <div class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="/" class="navbar-brand"><img src="/static/img/logo.png" /></a>
+          <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
+        <div class="navbar-collapse collapse" id="navbar-main">
+          <ul class="nav navbar-nav">
+            <li><h3>GH PM Search</h3></li>
+          </ul>
+
+          <ul class="nav navbar-nav navbar-right col-lg-4">
+            <li id="status-wrapper" style="width:100%"></li>
+          </ul>
+
+        </div>
+      </div>
+    </div>
+{{end}}

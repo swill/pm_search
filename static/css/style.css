@@ -1,0 +1,80 @@
+body {
+    padding-top: 50px;
+}
+
+
+.navbar-brand img {
+    height: 30px;
+    margin-top: -5px;
+}
+.navbar-nav h3 {
+    margin-top: 14px;
+}
+.progress {
+    height:38px;
+    margin-bottom:0;
+    margin-top: 6px;
+}
+.progress-bar {
+    font-size: 15px;
+    padding-top: 7px;
+}
+#status-wrapper .status-success {
+    text-align:right;
+    margin-top: 15px;
+}
+#status-wrapper .fail-success {
+    color:red;
+    text-align:right;
+    margin-top: 15px;
+}
+
+.pad-top {
+    margin-top:3em;
+}
+
+.center-block {
+    float:none;
+}
+
+.search-wrapper .form-control,
+.search-wrapper .btn,
+.search-wrapper .input-group-addon {
+    height: 60px;
+    font-size: 28px;
+}
+.search-wrapper .input-group-addon {
+    padding-top: 12px;
+}
+.search-wrapper .input-group-addon a {
+    color:#537CA8;
+}
+.search-wrapper .input-group-addon a:hover {
+    color:#3F658E;
+}
+
+#help-modal .modal-header button {
+    font-size: 28px;
+}
+#help-modal .modal-dialog {
+    margin-top:75px;
+}
+
+.pager .showing {
+    display: inline-block;
+    padding: 0 10px;
+    font-family: monospace;
+}
+
+#results .panel-title {
+    font-weight:bold;
+}
+#results .panel-subtitle {
+    font-size: 75%;
+    margin-top: .5em;
+}
+
+#results .quoteheader,
+#results blockquote {
+    font-size:12px;
+}
