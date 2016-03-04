@@ -145,7 +145,7 @@
   {{range .Hits}}
     <div class="panel panel-primary">
       <div class="panel-heading">
-        <h3 class="panel-title">{{.Title}}</h3>
+        <a href="{{.Url}}" target="_blank"><h3 class="panel-title">{{.Title}}</h3></a>
         <div class="panel-subtitle">from <b>{{.From}}</b> to <b>{{.To}}</b> on <b>{{.Date}}</b></div>
       </div>
       <div class="panel-body">
